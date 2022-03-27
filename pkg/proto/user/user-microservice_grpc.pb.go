@@ -23,7 +23,7 @@ type UserServiceClient interface {
 	GetUserById(ctx context.Context, in *UserReqID, opts ...grpc.CallOption) (*User, error)
 	GetUserByUuid(ctx context.Context, in *UserReqUuid, opts ...grpc.CallOption) (*User, error)
 	GetUserByLogin(ctx context.Context, in *UserReqLogin, opts ...grpc.CallOption) (*User, error)
-	DeleteUser(ctx context.Context, in *UserReqID, opts ...grpc.CallOption) (*User, error)
+	DeleteUser(ctx context.Context, in *UserReqUuid, opts ...grpc.CallOption) (*User, error)
 	UpdateUser(ctx context.Context, in *UpdateUserReq, opts ...grpc.CallOption) (*User, error)
 	GetAll(ctx context.Context, in *SelectionReq, opts ...grpc.CallOption) (*Selection, error)
 	HeartbeatCheck(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -73,7 +73,7 @@ func (c *userServiceClient) GetUserByLogin(ctx context.Context, in *UserReqLogin
 	return out, nil
 }
 
-func (c *userServiceClient) DeleteUser(ctx context.Context, in *UserReqID, opts ...grpc.CallOption) (*User, error) {
+func (c *userServiceClient) DeleteUser(ctx context.Context, in *UserReqUuid, opts ...grpc.CallOption) (*User, error) {
 	out := new(User)
 	err := c.cc.Invoke(ctx, "/user.UserService/DeleteUser", in, out, opts...)
 	if err != nil {
@@ -117,7 +117,7 @@ type UserServiceServer interface {
 	GetUserById(context.Context, *UserReqID) (*User, error)
 	GetUserByUuid(context.Context, *UserReqUuid) (*User, error)
 	GetUserByLogin(context.Context, *UserReqLogin) (*User, error)
-	DeleteUser(context.Context, *UserReqID) (*User, error)
+	DeleteUser(context.Context, *UserReqUuid) (*User, error)
 	UpdateUser(context.Context, *UpdateUserReq) (*User, error)
 	GetAll(context.Context, *SelectionReq) (*Selection, error)
 	HeartbeatCheck(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
@@ -140,7 +140,7 @@ func (UnimplementedUserServiceServer) GetUserByUuid(context.Context, *UserReqUui
 func (UnimplementedUserServiceServer) GetUserByLogin(context.Context, *UserReqLogin) (*User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserByLogin not implemented")
 }
-func (UnimplementedUserServiceServer) DeleteUser(context.Context, *UserReqID) (*User, error) {
+func (UnimplementedUserServiceServer) DeleteUser(context.Context, *UserReqUuid) (*User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteUser not implemented")
 }
 func (UnimplementedUserServiceServer) UpdateUser(context.Context, *UpdateUserReq) (*User, error) {
@@ -238,7 +238,7 @@ func _UserService_GetUserByLogin_Handler(srv interface{}, ctx context.Context, d
 }
 
 func _UserService_DeleteUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserReqID)
+	in := new(UserReqUuid)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -250,7 +250,7 @@ func _UserService_DeleteUser_Handler(srv interface{}, ctx context.Context, dec f
 		FullMethod: "/user.UserService/DeleteUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).DeleteUser(ctx, req.(*UserReqID))
+		return srv.(UserServiceServer).DeleteUser(ctx, req.(*UserReqUuid))
 	}
 	return interceptor(ctx, in, info, handler)
 }
