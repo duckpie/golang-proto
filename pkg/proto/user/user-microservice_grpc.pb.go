@@ -24,6 +24,7 @@ type UserServiceClient interface {
 	GetUserByUuid(ctx context.Context, in *UserReqUuid, opts ...grpc.CallOption) (*User, error)
 	GetUserByLogin(ctx context.Context, in *UserReqLogin, opts ...grpc.CallOption) (*User, error)
 	DeleteUser(ctx context.Context, in *UserReqID, opts ...grpc.CallOption) (*User, error)
+	UpdateUser(ctx context.Context, in *UpdateUserReq, opts ...grpc.CallOption) (*User, error)
 	GetAll(ctx context.Context, in *SelectionReq, opts ...grpc.CallOption) (*Selection, error)
 	HeartbeatCheck(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
@@ -81,6 +82,15 @@ func (c *userServiceClient) DeleteUser(ctx context.Context, in *UserReqID, opts 
 	return out, nil
 }
 
+func (c *userServiceClient) UpdateUser(ctx context.Context, in *UpdateUserReq, opts ...grpc.CallOption) (*User, error) {
+	out := new(User)
+	err := c.cc.Invoke(ctx, "/user.UserService/UpdateUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userServiceClient) GetAll(ctx context.Context, in *SelectionReq, opts ...grpc.CallOption) (*Selection, error) {
 	out := new(Selection)
 	err := c.cc.Invoke(ctx, "/user.UserService/GetAll", in, out, opts...)
@@ -108,6 +118,7 @@ type UserServiceServer interface {
 	GetUserByUuid(context.Context, *UserReqUuid) (*User, error)
 	GetUserByLogin(context.Context, *UserReqLogin) (*User, error)
 	DeleteUser(context.Context, *UserReqID) (*User, error)
+	UpdateUser(context.Context, *UpdateUserReq) (*User, error)
 	GetAll(context.Context, *SelectionReq) (*Selection, error)
 	HeartbeatCheck(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	mustEmbedUnimplementedUserServiceServer()
@@ -131,6 +142,9 @@ func (UnimplementedUserServiceServer) GetUserByLogin(context.Context, *UserReqLo
 }
 func (UnimplementedUserServiceServer) DeleteUser(context.Context, *UserReqID) (*User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteUser not implemented")
+}
+func (UnimplementedUserServiceServer) UpdateUser(context.Context, *UpdateUserReq) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
 }
 func (UnimplementedUserServiceServer) GetAll(context.Context, *SelectionReq) (*Selection, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAll not implemented")
@@ -241,6 +255,24 @@ func _UserService_DeleteUser_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).UpdateUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/UpdateUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).UpdateUser(ctx, req.(*UpdateUserReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _UserService_GetAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SelectionReq)
 	if err := dec(in); err != nil {
@@ -303,6 +335,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteUser",
 			Handler:    _UserService_DeleteUser_Handler,
+		},
+		{
+			MethodName: "UpdateUser",
+			Handler:    _UserService_UpdateUser_Handler,
 		},
 		{
 			MethodName: "GetAll",
