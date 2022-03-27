@@ -20,7 +20,9 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
 	CreateUser(ctx context.Context, in *NewUser, opts ...grpc.CallOption) (*User, error)
-	GetUser(ctx context.Context, in *UserReq, opts ...grpc.CallOption) (*User, error)
+	GetUserById(ctx context.Context, in *UserReq, opts ...grpc.CallOption) (*User, error)
+	GetUserByUuid(ctx context.Context, in *UserReq, opts ...grpc.CallOption) (*User, error)
+	GetUserByLogin(ctx context.Context, in *UserReq, opts ...grpc.CallOption) (*User, error)
 	DeleteUser(ctx context.Context, in *UserReq, opts ...grpc.CallOption) (*User, error)
 	GetAll(ctx context.Context, in *SelectionReq, opts ...grpc.CallOption) (*Selection, error)
 	HeartbeatCheck(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -43,9 +45,27 @@ func (c *userServiceClient) CreateUser(ctx context.Context, in *NewUser, opts ..
 	return out, nil
 }
 
-func (c *userServiceClient) GetUser(ctx context.Context, in *UserReq, opts ...grpc.CallOption) (*User, error) {
+func (c *userServiceClient) GetUserById(ctx context.Context, in *UserReq, opts ...grpc.CallOption) (*User, error) {
 	out := new(User)
-	err := c.cc.Invoke(ctx, "/user.UserService/GetUser", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/user.UserService/GetUserById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetUserByUuid(ctx context.Context, in *UserReq, opts ...grpc.CallOption) (*User, error) {
+	out := new(User)
+	err := c.cc.Invoke(ctx, "/user.UserService/GetUserByUuid", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetUserByLogin(ctx context.Context, in *UserReq, opts ...grpc.CallOption) (*User, error) {
+	out := new(User)
+	err := c.cc.Invoke(ctx, "/user.UserService/GetUserByLogin", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +104,9 @@ func (c *userServiceClient) HeartbeatCheck(ctx context.Context, in *emptypb.Empt
 // for forward compatibility
 type UserServiceServer interface {
 	CreateUser(context.Context, *NewUser) (*User, error)
-	GetUser(context.Context, *UserReq) (*User, error)
+	GetUserById(context.Context, *UserReq) (*User, error)
+	GetUserByUuid(context.Context, *UserReq) (*User, error)
+	GetUserByLogin(context.Context, *UserReq) (*User, error)
 	DeleteUser(context.Context, *UserReq) (*User, error)
 	GetAll(context.Context, *SelectionReq) (*Selection, error)
 	HeartbeatCheck(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
@@ -98,8 +120,14 @@ type UnimplementedUserServiceServer struct {
 func (UnimplementedUserServiceServer) CreateUser(context.Context, *NewUser) (*User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
 }
-func (UnimplementedUserServiceServer) GetUser(context.Context, *UserReq) (*User, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
+func (UnimplementedUserServiceServer) GetUserById(context.Context, *UserReq) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserById not implemented")
+}
+func (UnimplementedUserServiceServer) GetUserByUuid(context.Context, *UserReq) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserByUuid not implemented")
+}
+func (UnimplementedUserServiceServer) GetUserByLogin(context.Context, *UserReq) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserByLogin not implemented")
 }
 func (UnimplementedUserServiceServer) DeleteUser(context.Context, *UserReq) (*User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteUser not implemented")
@@ -141,20 +169,56 @@ func _UserService_CreateUser_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserService_GetUserById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UserReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).GetUser(ctx, in)
+		return srv.(UserServiceServer).GetUserById(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/user.UserService/GetUser",
+		FullMethod: "/user.UserService/GetUserById",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).GetUser(ctx, req.(*UserReq))
+		return srv.(UserServiceServer).GetUserById(ctx, req.(*UserReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetUserByUuid_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetUserByUuid(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/GetUserByUuid",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetUserByUuid(ctx, req.(*UserReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetUserByLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetUserByLogin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/GetUserByLogin",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetUserByLogin(ctx, req.(*UserReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -225,8 +289,16 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UserService_CreateUser_Handler,
 		},
 		{
-			MethodName: "GetUser",
-			Handler:    _UserService_GetUser_Handler,
+			MethodName: "GetUserById",
+			Handler:    _UserService_GetUserById_Handler,
+		},
+		{
+			MethodName: "GetUserByUuid",
+			Handler:    _UserService_GetUserByUuid_Handler,
+		},
+		{
+			MethodName: "GetUserByLogin",
+			Handler:    _UserService_GetUserByLogin_Handler,
 		},
 		{
 			MethodName: "DeleteUser",
