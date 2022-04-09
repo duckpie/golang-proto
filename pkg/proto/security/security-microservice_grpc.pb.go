@@ -20,7 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SecurityServiceClient interface {
 	Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*TokensPair, error)
-	AuthCheck(ctx context.Context, in *AuthCheckReq, opts ...grpc.CallOption) (*AuthCheckResp, error)
+	AuthCheck(ctx context.Context, in *AuthCheckReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	RefreshToken(ctx context.Context, in *RefreshTokenReq, opts ...grpc.CallOption) (*TokensPair, error)
 	Logout(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	HeartbeatCheck(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -43,8 +43,8 @@ func (c *securityServiceClient) Login(ctx context.Context, in *LoginReq, opts ..
 	return out, nil
 }
 
-func (c *securityServiceClient) AuthCheck(ctx context.Context, in *AuthCheckReq, opts ...grpc.CallOption) (*AuthCheckResp, error) {
-	out := new(AuthCheckResp)
+func (c *securityServiceClient) AuthCheck(ctx context.Context, in *AuthCheckReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/security.SecurityService/AuthCheck", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -84,7 +84,7 @@ func (c *securityServiceClient) HeartbeatCheck(ctx context.Context, in *emptypb.
 // for forward compatibility
 type SecurityServiceServer interface {
 	Login(context.Context, *LoginReq) (*TokensPair, error)
-	AuthCheck(context.Context, *AuthCheckReq) (*AuthCheckResp, error)
+	AuthCheck(context.Context, *AuthCheckReq) (*emptypb.Empty, error)
 	RefreshToken(context.Context, *RefreshTokenReq) (*TokensPair, error)
 	Logout(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	HeartbeatCheck(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
@@ -98,7 +98,7 @@ type UnimplementedSecurityServiceServer struct {
 func (UnimplementedSecurityServiceServer) Login(context.Context, *LoginReq) (*TokensPair, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
-func (UnimplementedSecurityServiceServer) AuthCheck(context.Context, *AuthCheckReq) (*AuthCheckResp, error) {
+func (UnimplementedSecurityServiceServer) AuthCheck(context.Context, *AuthCheckReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AuthCheck not implemented")
 }
 func (UnimplementedSecurityServiceServer) RefreshToken(context.Context, *RefreshTokenReq) (*TokensPair, error) {
